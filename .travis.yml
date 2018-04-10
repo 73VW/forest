@@ -1,50 +1,39 @@
-language: cpp 
 dist: trusty
-matrix:
-  include:
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env:
-        - MATRIX_EVAL="CXX=g++-4.9"
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-      env:
-        - MATRIX_EVAL="CXX=g++-5"
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-      env:
-        - MATRIX_EVAL="CXX=g++-6"
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-7
-      env:
-        - MATRIX_EVAL="CXX=g++-7"
+language: cpp
+
+git:
+  depth: 1 # download only last commit
+env:
+  global:
+    - MAKEFLAGS="-j 2"
+
+cache: apt
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+
 install:
-  - sudo pip install codecov
-before_script:
-  - eval "${MATRIX_EVAL}"
+  - export DEBIAN_FRONTEND=noninteractive
+  - sudo -E apt-get -yq update &>> ~/apt-get-update.log
+  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install g++-${GPP_VERSION}
+  - pip install --user codecov
+
 script:
+  - export CXX=g++-${GPP_VERSION}
   - curl -o include/catch.hpp -O https://raw.githubusercontent.com/catchorg/Catch2/master/single_include/catch.hpp
   - bash build_tests.sh
   - bash run_tests.sh
-after_success:
   - cd tests && codecov
+
+
+jobs:
+  include:
+    - stage: test
+      env: GPP_VERSION=4.9
+    - stage: test
+      env: GPP_VERSION=5
+    - stage: test
+      env: GPP_VERSION=6
+    - stage: test
+      env: GPP_VERSION=7

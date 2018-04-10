@@ -1,41 +1,21 @@
 CXXFLAGS=-std=c++14 -Wall -Werror
+# Source files extension
+SOURCE_EXT=cpp
+# Find all files with wanted extension
+SOURCES:=$(foreach ext, $(SOURCE_EXT), $(wildcard *.$(ext)))
+# Destination extension
+OBJ_EXT=o
+# Object files with wanted extension (converts for example test_trie.cpp to test_trie.o)
+OBJECT_FILES:=$(foreach source, $(SOURCES), $(addsuffix .$(OBJ_EXT),$(basename $(source))))
+# Destination files without extension
+DESTINATION:=$(foreach source, $(SOURCES), $(basename $(source)))
 
-all: example_binary_search_tree example_avl_tree example_splay_tree example_red_black_tree example_trie
+all: ${DESTINATION}
 
-example_binary_search_tree: example_binary_search_tree.o
-	$(CXX) example_binary_search_tree.o $(CXXFLAGS) -o example_binary_search_tree
-
-example_avl_tree: example_avl_tree.o
-	$(CXX) example_avl_tree.o $(CXXFLAGS) -o example_avl_tree
-
-example_splay_tree: example_splay_tree.o
-	$(CXX) example_splay_tree.o $(CXXFLAGS) -o example_splay_tree
-
-example_red_black_tree: example_red_black_tree.o
-	$(CXX) example_red_black_tree.o $(CXXFLAGS) -o example_red_black_tree
-
-example_trie: example_trie.o
-	$(CXX) example_trie.o $(CXXFLAGS) -o example_trie
-
-example_binary_search_tree.o: example_binary_search_tree.cpp
-	$(CXX) -c example_binary_search_tree.cpp $(CXXFLAGS) -I ../include
-
-example_avl_tree.o: example_avl_tree.cpp
-	$(CXX) -c example_avl_tree.cpp $(CXXFLAGS) -I ../include
-
-example_splay_tree.o: example_splay_tree.cpp
-	$(CXX) -c example_splay_tree.cpp $(CXXFLAGS) -I ../include
-
-example_red_black_tree.o: example_red_black_tree.cpp
-	$(CXX) -c example_red_black_tree.cpp $(CXXFLAGS) -I ../include
-
-example_trie.o: example_trie.cpp
-	$(CXX) -c example_trie.cpp $(CXXFLAGS) -I ../include
+# For a given destination executable, build it from its cpp source
+%:%.cpp
+	$(CXX) $(CXXFLAGS) -I ../include -o $@ $<
 
 clean:
-	rm -f *.o
-	rm -f example_binary_search_tree
-	rm -f example_avl_tree
-	rm -f example_splay_tree
-	rm -f example_red_black_tree
-	rm -f example_trie
+	rm -f ${OBJECT_FILES}
+	rm -f ${DESTINATION}

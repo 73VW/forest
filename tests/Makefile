@@ -1,25 +1,20 @@
 CXXFLAGS=-std=c++14 -Wall -Werror --coverage
+# Source files extension
+SOURCE_EXT=cpp
+# Find all files with wanted extension
+SOURCES:=$(foreach ext, $(SOURCE_EXT), $(wildcard *.$(ext)))
+# Destination extension
+DEST_EXT=o
+# Destination files with wanted extension (converts for example test_trie.cpp to test_trie.o)
+DESTINATIONS:=$(foreach source, $(SOURCES), $(addsuffix .$(DEST_EXT),$(basename $(source))))
 
-test: test_main.o test_binary_search_tree.o test_avl_tree.o test_splay_tree.o test_red_black_tree.o test_trie.o
-	$(CXX) test_main.o test_binary_search_tree.o test_avl_tree.o test_splay_tree.o test_red_black_tree.o test_trie.o $(CXXFLAGS) -o test
+# Build and then test all destination files
+test: ${DESTINATIONS}
+	$(CXX) ${DESTINATIONS} $(CXXFLAGS) -o test
 
-test_main.o: test_main.cpp
-	$(CXX) -c test_main.cpp $(CXXFLAGS) -I ../include
-
-test_binary_search_tree.o: test_binary_search_tree.cpp
-	$(CXX) -c test_binary_search_tree.cpp $(CXXFLAGS) -I ../include
-
-test_avl_tree.o: test_avl_tree.cpp
-	$(CXX) -c test_avl_tree.cpp $(CXXFLAGS) -I ../include
-
-test_splay_tree.o: test_splay_tree.cpp
-	$(CXX) -c test_splay_tree.cpp $(CXXFLAGS) -I ../include
-
-test_red_black_tree.o: test_red_black_tree.cpp
-	$(CXX) -c test_red_black_tree.cpp $(CXXFLAGS) -I ../include
-
-test_trie.o: test_trie.cpp
-	$(CXX) -c test_trie.cpp $(CXXFLAGS) -I ../include
+# For a given destination file using .o extension, build it from its cpp source
+%.o: %.cpp ## Converts from cpp to object
+	$(CXX) -c $< $(CXXFLAGS) -I ../include
 
 clean:
 	rm -f *.o
